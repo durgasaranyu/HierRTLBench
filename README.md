@@ -1,0 +1,326 @@
+# HierRTLBench: Evaluating LLM-Based Verilog RTL Generation Under Context-Window Constraints
+
+**MLCAD 2026 Paper Artifact**
+
+> Yashwant Rajesh, Karthikeya Patana, Durga Saranyu, Aathira Sunil, Sri Parameswaran, Kamesh Chandrasekar, Soumya Joshi, Paresh Saxena
+
+---
+
+## Overview
+
+HierRTLBench is a benchmark suite and evaluation framework for studying how context-window constraints affect LLM-based Verilog RTL generation. The benchmark compares two generation strategies across three VeriGen model sizes (2B, 6B, 16B parameters):
+
+- **Unified approach**: A single natural-language prompt per module, asking the model to generate the entire design at once.
+- **Hierarchical approach**: Each module is decomposed into well-scoped submodules. The model generates each submodule independently and the results are assembled into a full design.
+
+The benchmark covers 14 hardware design modules ranging from a simple ALU to AES-128 encryption and a RISC-V pipeline CPU.
+
+---
+
+## Repository Structure
+
+```
+HierRTLBench/
+├── README.md                        ← This file
+├── ARTIFACT_APPENDIX.md             ← MLCAD AE appendix
+├── requirements.txt                 ← Python dependencies
+├── run_evaluation.sh                ← End-to-end evaluation script
+├── evaluate_syntax.py               ← Syntax pass-rate checker (iverilog)
+├── verigen_prompts.txt              ← All 67 hierarchical submodule prompts
+│
+└── vgen_project/
+    ├── verigen_runner.py            ← Hierarchical inference runner
+    ├── run_unified_verigen.py       ← Unified inference runner
+    ├── generate_integrations.py     ← LLM-based integration top generator
+    ├── write_integrations.py        ← Deterministic integration top writer
+    ├── setup_env.sh                 ← Environment setup (venv + pip)
+    │
+    ├── run_verigen.slurm            ← SLURM: hierarchical, 6B, array 0–66
+    ├── run_verigen_2b.slurm         ← SLURM: hierarchical, 2B
+    ├── run_verigen_16b.slurm        ← SLURM: hierarchical, 16B
+    ├── run_unified.slurm            ← SLURM: unified, all models
+    ├── run_integrations.slurm       ← SLURM: integration generation
+    ├── run_integrations_2b.slurm    ← SLURM: integration, 2B
+    ├── run_integrations_6b.slurm    ← SLURM: integration, 6B
+    │
+    ├── verigen_out/                 ← Generated hierarchical Verilog outputs
+    │   ├── 2B/  m01_alu/ … m14_sort/
+    │   ├── 6B/  m01_alu/ … m14_sort/
+    │   └── 16B/ m01_alu/ … m14_sort/
+    │
+    ├── unified_outputs/             ← Generated unified Verilog outputs
+    │   ├── 2B/  m01_alu.v … m14_bubble_sort.v
+    │   ├── 6B/
+    │   └── 16B/
+    │
+    └── verigen_testbenches/
+        └── verigen_testbenches/     ← Testbenches for all 14 modules
+            ├── m01_alu/
+            ├── m02_regfile/
+            └── … m14_sort/
+```
+
+---
+
+## Benchmark Modules
+
+| ID | Module | Description |
+|----|--------|-------------|
+| M01 | ALU | Parameterized N-bit ALU (ADD, SUB, AND, OR, XOR, SHL) |
+| M02 | Register File | 32-entry 32-bit RISC register file |
+| M03 | UART TX | 8-N-1 UART transmitter with parametric baud rate |
+| M04 | Multi-Cycle CPU | Harvard RISC multi-cycle CPU |
+| M05 | Control Unit | Standalone CPU control unit FSM |
+| M06 | Pipeline CPU | 5-stage RISC-V pipeline |
+| M07 | D-Cache | Direct-mapped data cache |
+| M08 | Round-Robin Arbiter | N-port round-robin bus arbiter |
+| M09 | AES-128 Enc | AES-128 encryption core |
+| M10 | SHA-256 | SHA-256 hash core |
+| M11 | CRC-32 | CRC-32 generator |
+| M12 | FFT-8 | 8-point FFT |
+| M13 | MatMul-16 | 16×16 matrix multiplier |
+| M14 | Bubble Sort | Hardware bubble sort |
+
+---
+
+## Key Results
+
+| Model | Approach | Syntax Pass Rate |
+|-------|----------|-----------------|
+| VeriGen-2B | Hierarchical | 44% |
+| VeriGen-6B | Hierarchical | 0% |
+| VeriGen-16B | Hierarchical | 54% |
+
+> **Note:** The unified approach results are also present in `unified_outputs/`. Consult the paper for full tables comparing both approaches.
+
+---
+
+## Models
+
+All models are freely available on Hugging Face (no authentication required):
+
+| Model | Hugging Face ID | Approx. Size |
+|-------|----------------|--------------|
+| VeriGen-2B | `shailja/fine-tuned-codegen-2B-Verilog` | ~4 GB |
+| VeriGen-6B | `shailja/fine-tuned-codegen-6B-Verilog` | ~12 GB |
+| VeriGen-16B | `shailja/fine-tuned-codegen-16B-Verilog` | ~32 GB |
+
+**Inference settings (fixed for all experiments):**
+
+| Parameter | Value |
+|-----------|-------|
+| `max_length` | 2048 tokens |
+| `temperature` | 0.2 |
+| `top_p` | 0.95 |
+| `do_sample` | True |
+| Num samples | 1 per submodule |
+
+---
+
+## Hardware Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| GPU | 16 GB VRAM (for 2B) | NVIDIA H100 80 GB |
+| GPU RAM | 16 GB (2B), 24 GB (6B) | 80 GB (16B) |
+| System RAM | 32 GB | 64 GB |
+| Storage | ~60 GB (models + outputs) | 100 GB |
+
+> The experiments in the paper were run on an NVIDIA H100 GPU cluster via SLURM. The evaluation (syntax checking) can be run on any CPU-only machine with iverilog installed.
+
+---
+
+## Software Requirements
+
+- Python 3.9+
+- PyTorch (CUDA 12.x recommended)
+- `transformers`, `accelerate`, `sentencepiece`
+- [Icarus Verilog](http://iverilog.icarus.com/) (`iverilog`) for syntax evaluation
+- (Optional) Synopsys VCS + Verdi for coverage analysis
+
+Install Python dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Or use the provided setup script on an HPC cluster:
+
+```bash
+bash vgen_project/setup_env.sh
+```
+
+---
+
+## Quick Start
+
+### Option A: Evaluate Pre-Generated Outputs (No GPU Required)
+
+The repository already contains all generated Verilog outputs in `vgen_project/verigen_out/` and `vgen_project/unified_outputs/`. You can directly run syntax evaluation with iverilog:
+
+```bash
+# Install iverilog (Ubuntu/Debian)
+sudo apt-get install iverilog
+
+# Check syntax pass rates for all outputs
+python evaluate_syntax.py --hier_dir vgen_project/verigen_out \
+                          --unified_dir vgen_project/unified_outputs \
+                          --tb_dir vgen_project/verigen_testbenches/verigen_testbenches
+```
+
+### Option B: Regenerate Outputs (GPU Required)
+
+**Step 1: Set up the environment**
+
+```bash
+# Using pip (local)
+pip install -r requirements.txt
+
+# Or on HPC cluster
+bash vgen_project/setup_env.sh
+```
+
+**Step 2: Run hierarchical generation**
+
+```bash
+# Local: run all 67 submodules sequentially (2B model)
+python vgen_project/verigen_runner.py \
+    --model 2B \
+    --output_dir vgen_project/verigen_out
+
+# List all submodule indices
+python vgen_project/verigen_runner.py --list
+
+# HPC (SLURM): submit as a job array (6B model, indices 0–66)
+cd vgen_project && sbatch run_verigen.slurm
+```
+
+**Step 3: Run unified generation**
+
+```bash
+# Local
+python vgen_project/run_unified_verigen.py \
+    --model 2B \
+    --output_dir vgen_project/unified_outputs
+
+# HPC (SLURM)
+cd vgen_project && sbatch run_unified.slurm
+```
+
+**Step 4: Generate integration top modules**
+
+```bash
+# Deterministic integration wrappers (no LLM)
+python vgen_project/write_integrations.py \
+    --output_dir vgen_project/verigen_out
+```
+
+**Step 5: Evaluate syntax**
+
+```bash
+python evaluate_syntax.py \
+    --hier_dir vgen_project/verigen_out \
+    --unified_dir vgen_project/unified_outputs \
+    --tb_dir vgen_project/verigen_testbenches/verigen_testbenches
+```
+
+### Option C: Smoke Test (Single Submodule, Fast)
+
+```bash
+# Generate only M01 ALU adder-subtractor with VeriGen-2B
+python vgen_project/verigen_runner.py --model 2B \
+    --output_dir /tmp/hier_smoke \
+    --idx 0
+
+# Check iverilog syntax on the generated file
+iverilog -tnull /tmp/hier_smoke/m01_alu/alu_addsub.v && echo "PASS" || echo "FAIL"
+```
+
+---
+
+## Evaluation Script Reference
+
+### `evaluate_syntax.py`
+
+Checks iverilog syntax for all generated outputs and computes per-module and overall pass rates.
+
+```
+usage: evaluate_syntax.py [-h] [--hier_dir DIR] [--unified_dir DIR]
+                          [--tb_dir DIR] [--models 2B 6B 16B]
+
+Options:
+  --hier_dir     Root of hierarchical outputs  (default: vgen_project/verigen_out)
+  --unified_dir  Root of unified outputs       (default: vgen_project/unified_outputs)
+  --tb_dir       Root of testbench directory   (default: vgen_project/verigen_testbenches/verigen_testbenches)
+  --models       Model sizes to evaluate       (default: 2B 6B 16B)
+```
+
+Expected output (matches paper results):
+
+```
+=== Hierarchical Generation — Syntax Pass Rate ===
+Model   Passed  Total   Rate
+2B      6/14    14      42.9%
+6B      0/14    14       0.0%
+16B     8/14    14      57.1%
+
+=== Unified Generation — Syntax Pass Rate ===
+...
+```
+
+> **Tolerance:** Pass rates may vary by ±1 module (±7%) across runs due to temperature sampling.
+
+---
+
+## HPC / SLURM Usage
+
+All SLURM scripts are parameterized. Edit the `PYTHON` path and `HF_HOME` variables at the top of each script to match your cluster environment.
+
+| Script | Purpose | Array |
+|--------|---------|-------|
+| `run_verigen.slurm` | Hierarchical, VeriGen-6B | 0–66 |
+| `run_verigen_2b.slurm` | Hierarchical, VeriGen-2B | 0–66 |
+| `run_verigen_16b.slurm` | Hierarchical, VeriGen-16B | 0–66 |
+| `run_unified.slurm` | Unified, all models | single job |
+| `run_integrations.slurm` | Integration tops, 6B | — |
+
+Estimated GPU time per model:
+
+| Model | Per submodule | Full run (67 submodules) |
+|-------|--------------|--------------------------|
+| 2B | ~1 min | ~1.5 hrs |
+| 6B | ~2 min | ~2.5 hrs |
+| 16B | ~3 min | ~4 hrs |
+
+---
+
+## License
+
+<!-- TODO: Add license before final submission -->
+
+The benchmark code and scripts are released under [LICENSE TO BE ADDED].
+
+The VeriGen model weights are subject to the license terms of the original model:
+[`shailja/fine-tuned-codegen-2B-Verilog`](https://huggingface.co/shailja/fine-tuned-codegen-2B-Verilog).
+
+---
+
+## Citation
+
+If you use HierRTLBench in your research, please cite:
+
+```bibtex
+@inproceedings{rajesh2026hierrtlbench,
+  title     = {{HierRTLBench}: Evaluating {LLM}-Based {Verilog} {RTL} Generation Under Context-Window Constraints},
+  author    = {Rajesh, Yashwant and Patana, Karthikeya and Saranyu, Durga and Sunil, Aathira and Parameswaran, Sri and Chandrasekar, Kamesh and Joshi, Soumya and Saxena, Paresh},
+  booktitle = {Proceedings of the ACM/IEEE Workshop on Machine Learning for CAD (MLCAD)},
+  year      = {2026}
+}
+```
+
+---
+
+## Contact
+
+For questions about the artifact, please open a GitHub issue at  
+<https://github.com/yashwant/HierRTLBench> or contact the corresponding author via the information in the paper.

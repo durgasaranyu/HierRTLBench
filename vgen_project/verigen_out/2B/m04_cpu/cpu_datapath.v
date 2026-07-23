@@ -1,0 +1,127 @@
+// Multi-cycle RISC datapath. PC, IR, A/B regs, ALUout, MDR. Connects all datapath units.
+module cpu_datapath (
+    input         clk, rst,
+    input         pc_write, ir_write, reg_write, mem_write,
+    input         alu_src_a, alu_src_b, mem_to_reg, pc_source,
+    input  [1:0]  alu_op,
+    output [6:0]  opcode,
+    output [2:0]  funct3,
+    output        zero
+);
+    wire [6:0]    opcode;
+    wire [2:0]    funct3;
+    wire          alu_src_a_wire, alu_src_b_wire, mem_to_reg_wire;
+    wire          pc_source_wire;
+    wire          zero;
+    wire          alu_zero_wire;
+    wire          mem_zero_wire;
+    wire          mem_to_reg_wire;
+    wire          mem_write_wire;
+    wire          alu_src_a_in;
+    wire          alu_src_b_in;
+    wire          pc_write_wire;
+    wire          ir_write_wire;
+    wire          reg_write_wire;
+    wire          mem_write_wire;
+    wire          alu_op_wire;
+    wire          alu_src_a_wire_in;
+    wire          alu_src_b_wire_in;
+    wire          pc_source_wire_in;
+    wire          zero_wire;
+    wire          mem_zero_wire_in;
+    wire          mem_to_reg_wire_in;
+    wire          mem_write_wire_in;
+    wire          alu_src_a_in_in;
+    wire          alu_src_b_in_in;
+    wire          pc_write_in;
+    wire          ir_write_in;
+    wire          reg_write_in;
+    wire          mem_write_in;
+    wire          alu_op_in;
+    wire          alu_src_a_wire_in_in;
+    wire          alu_src_b_wire_in_in;
+    wire          pc_source_wire_in_in;
+    wire          zero_wire_in;
+    wire          mem_zero_wire_in;
+    wire          mem_to_reg_wire_in_in;
+    wire          mem_write_wire_in;
+    wire          alu_src_a_wire_in_in_in;
+    wire          alu_src_b_wire_in_in_in;
+    wire          pc_source_wire_in_in_in;
+    wire          zero_wire_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_in_in_in_in;
+    wire          pc_source_wire_in_in_in_in;
+    wire          zero_wire_in_in_in;
+    wire          mem_zero_wire_in_in;
+    wire          mem_to_reg_wire_in_in_in_in;
+    wire          mem_write_wire_in_in;
+    wire          alu_src_a_wire_in_in_in_in_in_in;
+    wire          alu_src_b_wire_in_in_
+endmodule

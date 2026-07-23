@@ -1,0 +1,20 @@
+# HierRTLBench — Python dependencies
+# Tested with Python 3.9 and 3.10 on Linux (CUDA 12.x)
+#
+# Install:
+#   pip install -r requirements.txt
+#
+# For GPU inference, install PyTorch with the correct CUDA wheel separately:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu121
+# (Replace cu121 with your CUDA version, e.g. cu118 for CUDA 11.8)
+
+# ── Core inference stack ──────────────────────────────────────────────────────
+torch>=2.1.0
+transformers>=4.38.0
+accelerate>=0.27.0
+sentencepiece>=0.1.99
+
+# ── Evaluation utilities ──────────────────────────────────────────────────────
+# (no extra Python packages required; iverilog must be installed system-wide)
+# Install iverilog on Ubuntu/Debian:  sudo apt-get install iverilog
+# Install iverilog on macOS:          brew install icarus-verilog

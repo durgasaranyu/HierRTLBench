@@ -1,0 +1,95 @@
+// Bubble sort FSM controller. States: 0=IDLE, 1=LOAD, 2=SORT, 3=DONE.
+// 8 elements. Outer pass index j (0..6), inner compare index i (0..6-j).
+module bubble_sort_fsm (
+    input        clk, rst, start,
+    output reg [1:0] state,
+    output reg [2:0] i, j,
+    output reg       swap_en, load_en, done
+);
+    reg [2:0] next_state;
+    reg [2:0] next_i;
+    reg [2:0] next_j;
+    reg [2:0] next_k;
+    reg [2:0] next_state_nxt;
+    reg [2:0] next_i_nxt;
+    reg [2:0] next_j_nxt;
+    reg [2:0] next_k_nxt;
+    reg [2:0] next_state_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_nxt_nxt_nxt_nxt;
+    reg [2:0] next_j_nxt_nxt_nxt_nxt;
+    reg [2:0] next_k_nxt_nxt_nxt_nxt;
+    reg [2:0] next_state_nxt_nxt_nxt_nxt;
+    reg [2:0] next_i_n
+endmodule

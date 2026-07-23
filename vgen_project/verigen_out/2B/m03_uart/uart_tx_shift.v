@@ -1,0 +1,77 @@
+// 8-bit UART shift register. Loads byte on load. Shifts LSB first on shift_en.
+module uart_tx_shift (
+    input        clk, rst,
+    input        load, shift_en,
+    input  [7:0] data,
+    output       serial_out,
+    output       empty
+);
+    reg [7:0] data_reg;
+    reg [7:0] data_next;
+    reg [7:0] data_shift;
+    reg [7:0] data_shift_next;
+    reg [7:0] data_shift_reg;
+    reg [7:0] data_shift_next_reg;
+    reg [7:0] data_shift_reg_next;
+    reg [7:0] data_shift_reg_next_reg;
+    reg [7:0] data_shift_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0] data_shift_reg_next_reg_next_reg_next_reg_next_reg_next;
+    reg [7:0]
+endmodule
