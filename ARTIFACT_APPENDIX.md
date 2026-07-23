@@ -119,9 +119,9 @@ Three open-weight VeriGen models, all hosted on Hugging Face:
 
 | Model | HF ID | Size | License |
 |-------|-------|------|---------|
-| VeriGen-2B | `shailja/fine-tuned-codegen-2B-Verilog` | ~4 GB | See HF page |
-| VeriGen-6B | `shailja/fine-tuned-codegen-6B-Verilog` | ~12 GB | See HF page |
-| VeriGen-16B | `shailja/fine-tuned-codegen-16B-Verilog` | ~32 GB | See HF page |
+| VeriGen-2B | `shailja/fine-tuned-codegen-2B-Verilog` | ~4 GB | Apache 2.0 |
+| VeriGen-6B | `shailja/fine-tuned-codegen-6B-Verilog` | ~12 GB | Apache 2.0 |
+| VeriGen-16B | `shailja/fine-tuned-codegen-16B-Verilog` | ~32 GB | Apache 2.0 |
 
 Models are downloaded automatically by the Hugging Face `transformers` library on first run. Set the `HF_HOME` environment variable to control the cache location (important on HPC clusters with limited home-directory quotas):
 

@@ -1,0 +1,488 @@
+% LaTeX Artifact Appendix — HierRTLBench
+% MLCAD 2026
+%
+% Based on the AE template by Grigori Fursin et al.
+% CC BY 4.0 license
+%
+% Build:
+%   pdflatex artifact_appendix.tex
+%   pdflatex artifact_appendix.tex   % (second pass for hyperref)
+
+\documentclass[sigplan,10pt,twocolumn]{acmart}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+% ── Listing style for shell / code snippets ───────────────────────────────────
+\lstdefinestyle{shell}{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=flexible,
+  keepspaces=true,
+  backgroundcolor=\color{gray!8},
+  frame=single,
+  framesep=2pt,
+  rulecolor=\color{gray!40},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=4pt,
+  belowskip=4pt,
+}
+\lstset{style=shell}
+
+% ── Suppress ACM copyright / conference info for standalone appendix PDF ──────
+\setcopyright{none}
+\acmConference{}{}{}
+\acmDOI{}
+\acmISBN{}
+
+% ── Tighten list spacing ──────────────────────────────────────────────────────
+\setlist[itemize]{leftmargin=*, topsep=2pt, itemsep=1pt, parsep=0pt}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+
+\title{Artifact Appendix: HierRTLBench --- Evaluating LLM-Based Verilog RTL
+Generation Under Context-Window Constraints}
+
+\author{Yashwant Rajesh}
+\affiliation{\institution{}\country{}}
+\author{Karthikeya Patana}
+\affiliation{\institution{}\country{}}
+\author{Durga Saranyu}
+\affiliation{\institution{}\country{}}
+\author{Aathira Sunil}
+\affiliation{\institution{}\country{}}
+\author{Sri Parameswaran}
+\affiliation{\institution{}\country{}}
+\author{Kamesh Chandrasekar}
+\affiliation{\institution{}\country{}}
+\author{Soumya Joshi}
+\affiliation{\institution{}\country{}}
+\author{Paresh Saxena}
+\affiliation{\institution{}\country{}}
+
+\maketitle
+
+% ─────────────────────────────────────────────────────────────────────────────
+\appendix
+\section{Artifact Appendix}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Abstract}
+
+This artifact provides the complete benchmark suite, generation scripts,
+pre-generated Verilog outputs, and testbenches for the \textit{HierRTLBench}
+paper. The artifact enables reviewers to:
+\begin{enumerate}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=0pt]
+  \item \textbf{Validate pre-generated outputs} (no GPU required): run
+        \texttt{iverilog} syntax checks on the included Verilog files and
+        reproduce the syntax pass-rate table from the paper.
+  \item \textbf{Regenerate outputs} (GPU required): re-run VeriGen 2B/6B/16B
+        using the provided Python/SLURM scripts and compare against paper
+        results.
+\end{enumerate}
+
+The benchmark compares two RTL generation strategies---\textit{unified} (one
+prompt per module) and \textit{hierarchical} (one prompt per submodule)---across
+14 hardware designs of increasing complexity, run through three open-weight
+VeriGen model sizes (2B, 6B, 16B parameters).
+
+\noindent\textbf{Minimal requirements for validation path (A):}
+any Linux/macOS machine with Python~3.9+ and \texttt{iverilog}, and
+$\sim$2~GB disk space.
+
+\noindent\textbf{For full regeneration path (B):}
+NVIDIA GPU with $\geq$16~GB VRAM ($\geq$80~GB for the 16B model) and
+$\sim$60~GB disk for model weights.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Artifact Checklist (Meta-information)}
+
+{\small
+\begin{itemize}
+  \item \textbf{Algorithm:} Hierarchical LLM prompt decomposition for Verilog
+        RTL code generation.
+  \item \textbf{Program:} 14 custom hardware benchmark modules (ALU, register
+        file, UART TX, multi-cycle CPU, control unit, pipeline CPU, data cache,
+        round-robin arbiter, AES-128, SHA-256, CRC-32, FFT-8, MatMul-16, bubble
+        sort). All included in the repository.
+  \item \textbf{Compilation:} Python~3.9+; PyTorch~2.1+ (CUDA~12.x).
+        See \texttt{requirements.txt}.
+  \item \textbf{Transformations:} None.
+  \item \textbf{Binary:} No pre-compiled binaries.
+  \item \textbf{Model:} VeriGen (CodeGen fine-tuned on Verilog):
+        \texttt{shailja/fine-tuned-codegen-\{2B,6B,16B\}-Verilog} on
+        Hugging~Face. Open-weight; no API key required.
+  \item \textbf{Model availability and access:} Freely downloadable from
+        Hugging~Face. Downloaded automatically by \texttt{transformers} on
+        first run. Set \texttt{HF\_HOME} to a scratch path on HPC clusters.
+  \item \textbf{LLM prompts and inference settings:} 67 hierarchical prompts
+        in \texttt{verigen\_prompts.txt}; 14 unified prompts inline in
+        \texttt{run\_unified\_verigen.py}. Settings:
+        \texttt{max\_length=2048}, \texttt{temperature=0.2},
+        \texttt{top\_p=0.95}, \texttt{do\_sample=True}, 1~sample per
+        submodule.
+  \item \textbf{Data set:} 14 hardware module specifications embedded as
+        prompt strings in the Python scripts. No external download required.
+  \item \textbf{Run-time environment:} Linux (Ubuntu~20.04/22.04). Python~3.9+,
+        PyTorch~2.1+, \texttt{transformers}~4.38+, \texttt{accelerate}~0.27+,
+        \texttt{sentencepiece}~0.1.99+.
+  \item \textbf{Container, VM, or locked environment:} Not provided. See
+        \texttt{vgen\_project/setup\_env.sh} for a reproducible venv setup.
+  \item \textbf{Hardware:} NVIDIA GPU required for regeneration ($\geq$16~GB
+        VRAM for 2B/6B; $\geq$80~GB for 16B). Paper experiments used NVIDIA
+        H100~80~GB on a SLURM cluster. Syntax evaluation (\texttt{iverilog})
+        runs on any CPU.
+  \item \textbf{Run-time state:} Temperature sampling; pass rates may vary by
+        $\pm$1 module ($\pm$7\%) across runs.
+  \item \textbf{Execution:} Sequential local: $\sim$1.5~hrs (2B), $\sim$2.5~hrs
+        (6B), $\sim$4~hrs (16B) on one H100. Syntax evaluation: $<$1~minute.
+  \item \textbf{Metrics:} Syntax pass rate---percentage of generated \texttt{.v}
+        files that compile without errors under \texttt{iverilog -tnull},
+        reported per model and per module.
+  \item \textbf{Output:} Per-module \texttt{.v} files in
+        \texttt{vgen\_project/verigen\_out/} (hierarchical) and
+        \texttt{vgen\_project/unified\_outputs/} (unified). Console summary
+        printed by \texttt{evaluate\_syntax.py}.
+  \item \textbf{Expected results and tolerances:}
+        VeriGen-2B: $\sim$44\%, VeriGen-6B: 0\%, VeriGen-16B: $\sim$54\%
+        syntax pass rate (hierarchical). $\pm$1 module tolerance per model.
+  \item \textbf{Experiments:} Pre-generated outputs included; reviewers can
+        validate without re-running inference (cached-output path). Full-rerun
+        path also supported.
+  \item \textbf{Proprietary EDA tools, PDKs, and licensed technology files:}
+        Synopsys VCS + Verdi used optionally for coverage (paper only). Not
+        required for key results. No PDKs or licensed IP used.
+  \item \textbf{How much disk space required (approximately)?:}
+        $\sim$2~GB for repository + outputs; $\sim$50~GB for model weights
+        (downloaded on demand).
+  \item \textbf{How much time is needed to prepare workflow
+        (approximately)?:} 10--15~minutes (pip install + iverilog install).
+  \item \textbf{How much time is needed to complete experiments
+        (approximately)?:} $<$5~minutes (cached validation); 6--8~GPU-hours
+        (full regeneration, all three models).
+  \item \textbf{API cost or GPU-hours required (if applicable):}
+        No API cost (open-weight local models). $\sim$6--8 H100~GPU-hours for
+        full regeneration.
+  \item \textbf{Publicly available?:} Yes.
+  \item \textbf{Code licenses (if publicly available)?:}
+        % TODO: Add license before camera-ready submission
+        To be confirmed.
+  \item \textbf{Data/model licenses and usage restrictions (if applicable):}
+        VeriGen model weights are subject to the license of
+        \texttt{shailja/fine-tuned-codegen-2B-Verilog} on Hugging~Face.
+        Reviewers should verify the current license before redistribution.
+  \item \textbf{Workflow framework used?:}
+        Python scripts + SLURM job arrays (HPC). No additional workflow
+        framework.
+  \item \textbf{Zenodo DOI for archived artifact:}
+        % TODO: Add Zenodo DOI after archiving
+        To be provided.
+\end{itemize}
+}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Description}
+
+\subsubsection{How to Access}
+
+Clone the repository:
+\begin{lstlisting}
+git clone https://github.com/yashwant/HierRTLBench.git
+cd HierRTLBench
+\end{lstlisting}
+
+All generated outputs are already included:
+\begin{itemize}
+  \item \texttt{vgen\_project/verigen\_out/\{2B,6B,16B\}/} --- hierarchical
+        Verilog outputs
+  \item \texttt{vgen\_project/unified\_outputs/\{2B,6B,16B\}/} --- unified
+        Verilog outputs
+  \item \texttt{vgen\_project/verigen\_testbenches/} --- testbenches for all
+        14 modules
+\end{itemize}
+
+Approximate disk usage after clone: $\sim$500~MB (outputs). Model weights
+($\sim$50~GB) are downloaded on demand.
+
+\subsubsection{Hardware Dependencies}
+
+\begin{itemize}
+  \item \textbf{Syntax validation:} Any CPU; no GPU required.
+  \item \textbf{Full regeneration:} NVIDIA GPU with CUDA~12.x.
+    \begin{itemize}
+      \item VeriGen-2B: $\geq$16~GB VRAM
+      \item VeriGen-6B: $\geq$24~GB VRAM
+      \item VeriGen-16B: $\geq$80~GB VRAM (H100 or A100~80~GB recommended)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Software Dependencies}
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Dependency & Version & Source \\
+\midrule
+Python & 3.9+ & system / Conda \\
+PyTorch & 2.1+ & pytorch.org \\
+transformers & 4.38+ & PyPI \\
+accelerate & 0.27+ & PyPI \\
+sentencepiece & 0.1.99+ & PyPI \\
+iverilog & 11.0+ & apt / brew \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Commercial Software and PDK Dependencies}
+
+Synopsys VCS + Verdi were used \emph{optionally} for simulation coverage
+analysis in the paper. These tools are \textbf{not required} to reproduce
+the primary syntax pass-rate results. Reviewers without VCS/Verdi access
+can use \texttt{iverilog} for all key experiments. No PDKs or proprietary
+technology files are used.
+
+\subsubsection{Data Sets}
+
+The benchmark consists of 14 hardware module specifications embedded directly
+as prompt strings in:
+\begin{itemize}
+  \item \texttt{vgen\_project/verigen\_runner.py} --- hierarchical, 67
+        submodule prompts
+  \item \texttt{vgen\_project/run\_unified\_verigen.py} --- unified, 14 module
+        prompts
+  \item \texttt{verigen\_prompts.txt} --- human-readable listing of all prompts
+\end{itemize}
+No external dataset download is required.
+
+\subsubsection{Models}
+
+Three open-weight VeriGen models hosted on Hugging~Face:
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Model & HF Identifier & Size \\
+\midrule
+VeriGen-2B  & \texttt{shailja/fine-tuned-codegen-2B-Verilog}  & $\sim$4~GB \\
+VeriGen-6B  & \texttt{shailja/fine-tuned-codegen-6B-Verilog}  & $\sim$12~GB \\
+VeriGen-16B & \texttt{shailja/fine-tuned-codegen-16B-Verilog} & $\sim$32~GB \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Models are downloaded automatically on first run. Set \texttt{HF\_HOME} to
+redirect the cache:
+\begin{lstlisting}
+export HF_HOME=/scratch/<username>/hf_cache
+\end{lstlisting}
+
+\noindent Inference settings (identical for all experiments):
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Parameter & Value \\
+\midrule
+\texttt{max\_length} & 2048 tokens \\
+\texttt{temperature} & 0.2 \\
+\texttt{top\_p} & 0.95 \\
+\texttt{do\_sample} & True \\
+Samples per submodule & 1 \\
+Stop sequences & None \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Installation}
+
+\textbf{Step 1:} Install system dependencies.
+\begin{lstlisting}
+# Ubuntu/Debian
+sudo apt-get install iverilog python3 python3-pip
+
+# macOS (Homebrew)
+brew install icarus-verilog python
+\end{lstlisting}
+
+\textbf{Step 2:} Install Python dependencies.
+\begin{lstlisting}
+pip install -r requirements.txt
+# GPU inference: match your CUDA version
+pip install torch \
+  --index-url https://download.pytorch.org/whl/cu121
+\end{lstlisting}
+
+\textbf{Step 3 (HPC only):} Use the provided setup script.
+\begin{lstlisting}
+bash vgen_project/setup_env.sh
+\end{lstlisting}
+
+\noindent\textbf{Smoke test:}
+\begin{lstlisting}
+iverilog -tnull \
+  vgen_project/verigen_out/2B/m01_alu/alu_addsub.v \
+  && echo "PASS" || echo "FAIL"
+
+python evaluate_syntax.py --models 2B
+\end{lstlisting}
+Expected: \texttt{PASS} from \texttt{iverilog}; a pass-rate summary table
+from the Python script.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Experiment Workflow}
+
+\noindent\textbf{Path A --- Cached-output validation (recommended, no GPU):}
+\begin{lstlisting}
+python evaluate_syntax.py \
+  --hier_dir    vgen_project/verigen_out \
+  --unified_dir vgen_project/unified_outputs \
+  --tb_dir      vgen_project/verigen_testbenches/\
+verigen_testbenches
+\end{lstlisting}
+
+\noindent\textbf{Path B --- Full regeneration (GPU required):}
+\begin{lstlisting}
+# Hierarchical generation (all models)
+python vgen_project/verigen_runner.py \
+  --model 2B --output_dir /tmp/hier_out
+python vgen_project/verigen_runner.py \
+  --model 6B --output_dir /tmp/hier_out
+python vgen_project/verigen_runner.py \
+  --model 16B --output_dir /tmp/hier_out
+
+# Unified generation (all models)
+python vgen_project/run_unified_verigen.py \
+  --model 2B --output_dir /tmp/unified_out
+# ... repeat for 6B and 16B
+
+# Write deterministic integration tops
+python vgen_project/write_integrations.py \
+  --output_dir /tmp/hier_out
+
+# Evaluate
+python evaluate_syntax.py \
+  --hier_dir /tmp/hier_out \
+  --unified_dir /tmp/unified_out
+\end{lstlisting}
+
+\noindent\textbf{Path C --- Bounded subset (single module, fastest):}
+\begin{lstlisting}
+python vgen_project/verigen_runner.py \
+  --model 2B --output_dir /tmp/smoke --idx 0
+iverilog -tnull \
+  /tmp/smoke/m01_alu/alu_addsub.v \
+  && echo "PASS" || echo "FAIL"
+\end{lstlisting}
+
+\noindent The convenience wrapper \texttt{run\_evaluation.sh} encapsulates all
+paths:
+\begin{lstlisting}
+bash run_evaluation.sh --cached      # Path A
+bash run_evaluation.sh --regen-2b    # Path B, 2B only
+bash run_evaluation.sh --full-regen  # Path B, all models
+\end{lstlisting}
+
+\noindent\textbf{Mapping scripts to paper results:}
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{@{}p{2.6cm}p{4.6cm}@{}}
+\toprule
+Paper Result & Script / Output Path \\
+\midrule
+Hierarchical pass rates &
+  \texttt{evaluate\_syntax.py}\newline
+  \texttt{--hier\_dir verigen\_out} \\
+Unified pass rates &
+  \texttt{evaluate\_syntax.py}\newline
+  \texttt{--unified\_dir unified\_outputs} \\
+Per-module breakdown & Same script, per-module rows \\
+Generated Verilog (hier.) & \texttt{verigen\_out/\{2B,6B,16B\}/} \\
+Generated Verilog (unified) & \texttt{unified\_outputs/\{2B,6B,16B\}/} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Evaluation and Expected Results}
+
+Run \texttt{evaluate\_syntax.py} (Path~A) to reproduce the key table. Expected
+output:
+
+\begin{table}[h]
+\centering\small
+\caption{Expected syntax pass rates (hierarchical approach).}
+\label{tab:expected}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Model & Passed & Total & Rate \\
+\midrule
+VeriGen-2B  & 6/14 & 14 & $\sim$44\% \\
+VeriGen-6B  & 0/14 & 14 &    0\%     \\
+VeriGen-16B & 8/14 & 14 & $\sim$54\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Acceptable tolerance:} $\pm$1 module ($\pm$7\%) per model per
+approach, due to temperature sampling (\texttt{temperature=0.2}).
+
+\noindent\textbf{Validation path:} For exact paper reproduction, use
+pre-generated outputs (Path~A). For independent verification, use Path~B and
+compare within the above tolerance. Exact text reproduction of Verilog files is
+not required.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Experiment Customization}
+
+\begin{itemize}
+  \item \textbf{Model size:} Pass \texttt{--model 2B/6B/16B} to any runner.
+  \item \textbf{Single submodule:} Use \texttt{--idx N} (0--66) in
+        \texttt{verigen\_runner.py} for one submodule at a time (used by SLURM
+        array jobs).
+  \item \textbf{Output directory:} \texttt{--output\_dir /path/to/dir} in all
+        scripts.
+  \item \textbf{Inference temperature:} Edit \texttt{GEN\_CFG["temperature"]}
+        in \texttt{verigen\_runner.py} or \texttt{run\_unified\_verigen.py}.
+  \item \textbf{Custom prompts:} Append entries to the \texttt{SUBMODULES}
+        list in \texttt{verigen\_runner.py} following the existing format.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Notes}
+
+\begin{itemize}
+  \item SLURM scripts contain HPC-specific paths (e.g.,
+        \texttt{/scratch/soumyaj/}). Edit the \texttt{PYTHON} and
+        \texttt{HF\_HOME} variables at the top of each script before
+        submitting on a different cluster.
+  \item VeriGen uses the CodeGen architecture with a hard 2048-token limit.
+        Generation stops at this limit even if a module is incomplete; this
+        constraint is the central subject of the paper.
+  \item Total model weight storage: $\sim$48~GB for all three sizes. Plan
+        storage accordingly, especially on HPC home directories.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Methodology}
+
+Submission, reviewing and badging methodology:
+
+\begin{itemize}
+  \item \url{https://www.acm.org/publications/policies/artifact-review-and-badging-current}
+  \item \url{https://github.com/ml-eda/artifact-evaluation/}
+\end{itemize}
+
+\end{document}
