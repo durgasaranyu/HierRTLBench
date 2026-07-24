@@ -110,7 +110,7 @@ All models are freely available on Hugging Face (no authentication required):
 | Parameter | Value |
 |-----------|-------|
 | `max_length` | 2048 tokens |
-| `temperature` | 0.2 |
+| `temperature` | 0 |
 | `top_p` | 0.95 |
 | `do_sample` | True |
 | Num samples | 1 per submodule |
