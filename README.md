@@ -26,7 +26,7 @@ HierRTLBench/
 ├── requirements.txt                 ← Python dependencies
 ├── run_evaluation.sh                ← End-to-end evaluation script
 ├── evaluate_syntax.py               ← Syntax pass-rate checker (iverilog)
-├── verigen_prompts.txt              ← All 67 hierarchical submodule prompts
+├── verigen_prompts.txt              ← Hierarchical submodule prompts (64 in verigen_runner.py; paper reports 50 — see artifact_appendix.tex known-discrepancy note)
 │
 └── vgen_project/
     ├── verigen_runner.py            ← Hierarchical inference runner
@@ -168,6 +168,13 @@ python evaluate_syntax.py --hier_dir vgen_project/verigen_out \
                           --tb_dir vgen_project/verigen_testbenches/verigen_testbenches
 ```
 
+#### Option A' — Docker (no local installs needed)
+
+```bash
+docker build -t hierrtlbench-ae .
+docker run --rm hierrtlbench-ae bash run_evaluation.sh --cached
+```
+
 ### Option B: Regenerate Outputs (GPU Required)
 
 **Step 1: Set up the environment**
@@ -296,9 +303,7 @@ Estimated GPU time per model:
 
 ## License
 
-<!-- TODO: Add license before final submission -->
-
-The benchmark code and scripts are released under [LICENSE TO BE ADDED].
+The benchmark code and scripts are released under the [MIT License](LICENSE).
 
 The VeriGen model weights are subject to the license terms of the original model:
 [`shailja/fine-tuned-codegen-2B-Verilog`](https://huggingface.co/shailja/fine-tuned-codegen-2B-Verilog).
@@ -312,7 +317,7 @@ If you use HierRTLBench in your research, please cite:
 ```bibtex
 @inproceedings{rajesh2026hierrtlbench,
   title     = {{HierRTLBench}: Evaluating {LLM}-Based {Verilog} {RTL} Generation Under Context-Window Constraints},
-  author    = {Rajesh, Yashwant and Patana, Karthikeya and Saranyu, Durga and Sunil, Aathira and Parameswaran, Sri and Chandrasekar, Kamesh and Joshi, Soumya and Saxena, Paresh},
+  author    = {Yashwant Rajesh, Karthikeya Patana, Durga Saranyu, Aathira Sunil, Sri Parameswaran, Kamesh Chandrasekar, Soumya Joshi, Paresh Saxena}
   booktitle = {Proceedings of the ACM/IEEE Workshop on Machine Learning for CAD (MLCAD)},
   year      = {2026}
 }
