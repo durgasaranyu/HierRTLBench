@@ -64,8 +64,4 @@ grep -i "error" logs/verigen_*.err
 find verigen_out/6B -name "*.v" | sort
 ```
 
-## Note on file/task counts
 
-Counts in this log (50 submodules per model, 150 verification runs across
-2B/6B/16B) are reconciled to match the finalized benchmark reported in the
-paper.
