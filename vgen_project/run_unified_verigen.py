@@ -32,7 +32,7 @@ GEN_CFG = {
     "max_length":   2048,   
     "temperature":  0,    
     "top_p":        0.95,
-    "do_sample":    True,
+    "do_sample":    False,
 }
 
 # ─── 14 Unified Prompts ──────────────────────────────────────────────────────
