@@ -22,16 +22,22 @@ The benchmark covers 14 hardware design modules ranging from a simple ALU to AES
 ```
 HierRTLBench/
 ├── README.md                        ← This file
-├── ARTIFACT_APPENDIX.md             ← MLCAD AE appendix
-├── requirements.txt                 ← Python dependencies
+├── artifact_appendix.tex            ← MLCAD AE appendix (LaTeX)
+├── MLCAD_HierRTLBench.pdf           ← Paper (camera-ready)
+├── HierRTLBench.docx                ← Technical report artifact
+├── Hpc_environment_setup_log.md     ← HPC setup/troubleshooting log
+├── requirements.txt                 ← Python dependencies (pip)
+├── conda_env.yml                    ← Python dependencies (conda, alternative)
 ├── run_evaluation.sh                ← End-to-end evaluation script
 ├── evaluate_syntax.py               ← Syntax pass-rate checker (iverilog)
 ├── verigen_prompts.txt              ← Hierarchical submodule prompts (50 in verigen_runner.py)
+├── Dockerfile                       ← Container build for cached-output evaluation
+├── LICENSE
+├── .gitignore
 │
 └── vgen_project/
     ├── verigen_runner.py            ← Hierarchical inference runner
     ├── run_unified_verigen.py       ← Unified inference runner
-    ├── generate_integrations.py     ← LLM-based integration top generator
     ├── write_integrations.py        ← Deterministic integration top writer
     ├── setup_env.sh                 ← Environment setup (venv + pip)
     │
@@ -39,17 +45,19 @@ HierRTLBench/
     ├── run_verigen_2b.slurm         ← SLURM: hierarchical, 2B
     ├── run_verigen_16b.slurm        ← SLURM: hierarchical, 16B
     ├── run_unified.slurm            ← SLURM: unified, all models
-    ├── run_integrations.slurm       ← SLURM: integration generation
-    ├── run_integrations_2b.slurm    ← SLURM: integration, 2B
-    ├── run_integrations_6b.slurm    ← SLURM: integration, 6B
     │
     ├── verigen_out/                 ← Generated hierarchical Verilog outputs
     │   ├── 2B/  m01_alu/ … m14_sort/
     │   ├── 6B/  m01_alu/ … m14_sort/
     │   └── 16B/ m01_alu/ … m14_sort/
+    │       └── m01_alu/  alu_addsub.v, alu_flags.v, alu_logic.v,
+    │                     alu_shift.v, alu_top_integration.v
     │
     ├── unified_outputs/             ← Generated unified Verilog outputs
-    │   ├── 2B/  m01_alu.v … m14_bubble_sort.v
+    │   ├── 2B/  m01_alu.v, m02_regfile.v, m03_uart_tx.v, m04_multicycle_cpu.v,
+    │   │        m05_control_unit.v, m06_pipeline_cpu.v, m07_dcache.v,
+    │   │        m08_round_robin_arb.v, m09_aes128_enc.v, m10_sha256.v,
+    │   │        m11_crc32.v … m14_bubble_sort.v
     │   ├── 6B/
     │   └── 16B/
     │
@@ -59,6 +67,8 @@ HierRTLBench/
             ├── m02_regfile/
             └── … m14_sort/
 ```
+
+> **Note:** Integration top modules are generated deterministically via `write_integrations.py` and are named `<module>_top_integration.v` (e.g. `alu_top_integration.v`) inside each module's folder under `verigen_out/`. There is no LLM-based integration generator in this repository — integration wrappers are assembled programmatically, not by the evaluated models.
 
 ---
 
@@ -138,10 +148,16 @@ All models are freely available on Hugging Face (no authentication required):
 - [Icarus Verilog](http://iverilog.icarus.com/) (`iverilog`) for syntax evaluation
 - (Optional) Synopsys VCS + Verdi for coverage analysis
 
-Install Python dependencies:
+Install Python dependencies with pip:
 
 ```bash
 pip install -r requirements.txt
+```
+
+Or with conda:
+
+```bash
+conda env create -f conda_env.yml
 ```
 
 Or use the provided setup script on an HPC cluster:
@@ -217,7 +233,7 @@ cd vgen_project && sbatch run_unified.slurm
 **Step 4: Generate integration top modules**
 
 ```bash
-# Deterministic integration wrappers (no LLM)
+# Deterministic integration wrappers (no LLM) — writes <module>_top_integration.v
 python vgen_project/write_integrations.py \
     --output_dir vgen_project/verigen_out
 ```
@@ -289,7 +305,6 @@ All SLURM scripts are parameterized. Edit the `PYTHON` path and `HF_HOME` variab
 | `run_verigen_2b.slurm` | Hierarchical, VeriGen-2B | 0–49 |
 | `run_verigen_16b.slurm` | Hierarchical, VeriGen-16B | 0–49 |
 | `run_unified.slurm` | Unified, all models | single job |
-| `run_integrations.slurm` | Integration tops, 6B | — |
 
 Estimated GPU time per model:
 
@@ -298,6 +313,8 @@ Estimated GPU time per model:
 | 2B | ~1 min | ~0.8 hrs |
 | 6B | ~2 min | ~1.7 hrs |
 | 16B | ~3 min | ~2.5 hrs |
+
+For detailed environment setup and cluster troubleshooting notes, see [`Hpc_environment_setup_log.md`](Hpc_environment_setup_log.md).
 
 ---
 
@@ -324,5 +341,3 @@ If you use HierRTLBench in your research, please cite:
 ```
 
 ---
-
-
