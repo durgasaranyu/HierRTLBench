@@ -40,7 +40,7 @@ GEN_CFG = {
     "max_length":   2048,   # Hard architectural limit of CodeGen 2B/6B
     "temperature":  0,    # Low temp = deterministic, better for RTL
     "top_p":        0.95,
-    "do_sample":    True,
+    "do_sample":    False,
 }
 
 # ─── Hierarchical submodule prompts ──────────────────────────────────────────
