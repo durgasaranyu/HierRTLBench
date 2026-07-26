@@ -26,7 +26,7 @@ HierRTLBench/
 ├── requirements.txt                 ← Python dependencies
 ├── run_evaluation.sh                ← End-to-end evaluation script
 ├── evaluate_syntax.py               ← Syntax pass-rate checker (iverilog)
-├── verigen_prompts.txt              ← Hierarchical submodule prompts (64 in verigen_runner.py; paper reports 50 — see artifact_appendix.tex known-discrepancy note)
+├── verigen_prompts.txt              ← Hierarchical submodule prompts (50 in verigen_runner.py)
 │
 └── vgen_project/
     ├── verigen_runner.py            ← Hierarchical inference runner
@@ -35,7 +35,7 @@ HierRTLBench/
     ├── write_integrations.py        ← Deterministic integration top writer
     ├── setup_env.sh                 ← Environment setup (venv + pip)
     │
-    ├── run_verigen.slurm            ← SLURM: hierarchical, 6B, array 0–66
+    ├── run_verigen.slurm            ← SLURM: hierarchical, 6B, array 0–49
     ├── run_verigen_2b.slurm         ← SLURM: hierarchical, 2B
     ├── run_verigen_16b.slurm        ← SLURM: hierarchical, 16B
     ├── run_unified.slurm            ← SLURM: unified, all models
@@ -112,7 +112,7 @@ All models are freely available on Hugging Face (no authentication required):
 | `max_length` | 2048 tokens |
 | `temperature` | 0 |
 | `top_p` | 0.95 |
-| `do_sample` | True |
+| `do_sample` | False |
 | Num samples | 1 per submodule |
 
 ---
@@ -190,7 +190,7 @@ bash vgen_project/setup_env.sh
 **Step 2: Run hierarchical generation**
 
 ```bash
-# Local: run all 67 submodules sequentially (2B model)
+# Local: run all 50 submodules sequentially (2B model)
 python vgen_project/verigen_runner.py \
     --model 2B \
     --output_dir vgen_project/verigen_out
@@ -198,7 +198,7 @@ python vgen_project/verigen_runner.py \
 # List all submodule indices
 python vgen_project/verigen_runner.py --list
 
-# HPC (SLURM): submit as a job array (6B model, indices 0–66)
+# HPC (SLURM): submit as a job array (6B model, indices 0–49)
 cd vgen_project && sbatch run_verigen.slurm
 ```
 
@@ -267,15 +267,15 @@ Expected output (matches paper results):
 ```
 === Hierarchical Generation — Syntax Pass Rate ===
 Model   Passed  Total   Rate
-2B      6/14    14      42.9%
-6B      0/14    14       0.0%
-16B     8/14    14      57.1%
+2B      22/50   50      44.0%
+6B      0/50    50       0.0%
+16B     27/50   50      54.0%
 
 === Unified Generation — Syntax Pass Rate ===
 ...
 ```
 
-> **Tolerance:** Pass rates may vary by ±1 module (±7%) across runs due to temperature sampling.
+> **Tolerance:** Pass rates may vary by ±1 submodule (±2%) across runs due to temperature sampling.
 
 ---
 
@@ -285,19 +285,19 @@ All SLURM scripts are parameterized. Edit the `PYTHON` path and `HF_HOME` variab
 
 | Script | Purpose | Array |
 |--------|---------|-------|
-| `run_verigen.slurm` | Hierarchical, VeriGen-6B | 0–66 |
-| `run_verigen_2b.slurm` | Hierarchical, VeriGen-2B | 0–66 |
-| `run_verigen_16b.slurm` | Hierarchical, VeriGen-16B | 0–66 |
+| `run_verigen.slurm` | Hierarchical, VeriGen-6B | 0–49 |
+| `run_verigen_2b.slurm` | Hierarchical, VeriGen-2B | 0–49 |
+| `run_verigen_16b.slurm` | Hierarchical, VeriGen-16B | 0–49 |
 | `run_unified.slurm` | Unified, all models | single job |
 | `run_integrations.slurm` | Integration tops, 6B | — |
 
 Estimated GPU time per model:
 
-| Model | Per submodule | Full run (67 submodules) |
+| Model | Per submodule | Full run (50 submodules) |
 |-------|--------------|--------------------------|
-| 2B | ~1 min | ~1.5 hrs |
-| 6B | ~2 min | ~2.5 hrs |
-| 16B | ~3 min | ~4 hrs |
+| 2B | ~1 min | ~0.8 hrs |
+| 6B | ~2 min | ~1.7 hrs |
+| 16B | ~3 min | ~2.5 hrs |
 
 ---
 
