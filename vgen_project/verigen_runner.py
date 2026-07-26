@@ -38,7 +38,7 @@ MODEL_MAP = {
 # ─── Generation config ───────────────────────────────────────────────────────
 GEN_CFG = {
     "max_length":   2048,   # Hard architectural limit of CodeGen 2B/6B
-    "temperature":  0.2,    # Low temp = deterministic, better for RTL
+    "temperature":  0,    # Low temp = deterministic, better for RTL
     "top_p":        0.95,
     "do_sample":    True,
 }
