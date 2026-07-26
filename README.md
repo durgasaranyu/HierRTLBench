@@ -325,7 +325,4 @@ If you use HierRTLBench in your research, please cite:
 
 ---
 
-## Contact
 
-For questions about the artifact, please open a GitHub issue at  
-<https://github.com/yashwant/HierRTLBench> or contact the corresponding author via the information in the paper.
