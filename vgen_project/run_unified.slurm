@@ -16,10 +16,10 @@ export CUDA_HOME=/usr/local/cuda
 export PATH=$CUDA_HOME/bin:$PATH
 export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/targets/x86_64-linux/lib:$LD_LIBRARY_PATH
 
-export HF_HOME="/scratch/soumyaj/vgen_project/hf_cache"
+export HF_HOME="/scratch/$USER/vgen_project/hf_cache"
 
 # ── Use your exact python environment ─────────────────────
-PYTHON=/scratch/soumyaj/miniconda3/envs/verigen/bin/python
+PYTHON=/scratch/$USER/miniconda3/envs/verigen/bin/python
 
 # ── Comprehensive Sanity Checks ───────────────────────────────────────────────
 echo "============================================"
@@ -39,7 +39,7 @@ $PYTHON -c "import torch; assert torch.cuda.is_available(), 'CUDA not available'
 }
 
 # The folder where the 2B, 6B, and 16B outputs will be saved
-OUTPUT_DIR="/scratch/soumyaj/vgen_project/unified_outputs"
+OUTPUT_DIR="/scratch/$USER/vgen_project/unified_outputs"
 mkdir -p "$OUTPUT_DIR"
 
 # ── Run the Python script for all 3 models ────────────────────────────────────

@@ -18,10 +18,10 @@ export PATH=$CUDA_HOME/bin:$PATH
 export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/targets/x86_64-linux/lib:$LD_LIBRARY_PATH
 
 # ── Fix for Disk Quota: Route HuggingFace downloads to /scratch ───────────────
-export HF_HOME="/scratch/soumyaj/vgen_project/hf_cache"
+export HF_HOME="/scratch/$USER/vgen_project/hf_cache"
 
 # ── Use conda python directly (bypasses venv symlink issue) ──────────────────
-PYTHON=/scratch/soumyaj/miniconda3/envs/verigen/bin/python
+PYTHON=/scratch/$USER/miniconda3/envs/verigen/bin/python
 
 # ── Sanity checks ─────────────────────────────────────────────────────────────
 echo "============================================"
@@ -42,7 +42,7 @@ $PYTHON -c "import torch; assert torch.cuda.is_available(), 'CUDA not available'
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 MODEL="6B"
-OUTPUT_DIR="/scratch/soumyaj/vgen_project/verigen_out"
+OUTPUT_DIR="/scratch/$USER/vgen_project/verigen_out"
 mkdir -p "$OUTPUT_DIR"
 
 # Run unbuffered (-u) so we see prints immediately

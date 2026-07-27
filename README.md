@@ -277,22 +277,6 @@ Options:
   --tb_dir       Root of testbench directory   (default: vgen_project/verigen_testbenches/verigen_testbenches)
   --models       Model sizes to evaluate       (default: 2B 6B 16B)
 ```
-
-Expected output (matches paper results):
-
-```
-=== Hierarchical Generation — Syntax Pass Rate ===
-Model   Passed  Total   Rate
-2B      22/50   50      44.0%
-6B      0/50    50       0.0%
-16B     27/50   50      54.0%
-
-=== Unified Generation — Syntax Pass Rate ===
-...
-```
-
-> **Tolerance:** Pass rates may vary by ±1 submodule (±2%) across runs due to temperature sampling.
-
 ---
 
 ## HPC / SLURM Usage
