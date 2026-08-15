@@ -52,7 +52,7 @@ SUBMODULES = [
 
     # ══════════════════════════════════════════════════════════════════════════
     # M01 – Parameterized N-bit ALU
-    # Hierarchy: alu_addsub -> alu_logic -> alu_shift -> alu_flags -> alu_top
+    # Hierarchy: alu_addsub -> alu_logic -> alu_shift -> alu_flags 
     # ══════════════════════════════════════════════════════════════════════════
     ("m01_alu", "alu_addsub",
      "// Parameterized N-bit adder-subtractor. op=0: result=a+b carry_out. op=1: result=a-b borrow.\n"
@@ -88,21 +88,10 @@ SUBMODULES = [
      "    output         carry_flag\n"
      ");\n"),
 
-    ("m01_alu", "alu_top",
-     "// N-bit ALU. op: 3'b000=ADD, 001=SUB, 010=AND, 011=OR, 100=XOR, 101=SHL.\n"
-     "// Synchronous reset. Registered outputs: result, zero_flag, carry_flag.\n"
-     "module alu #(parameter N = 8) (\n"
-     "    input              clk, rst,\n"
-     "    input  [N-1:0]     a, b,\n"
-     "    input  [2:0]       op,\n"
-     "    output reg [N-1:0] result,\n"
-     "    output reg         zero_flag,\n"
-     "    output reg         carry_flag\n"
-     ");\n"),
 
     # ══════════════════════════════════════════════════════════════════════════
     # M02 – 32-entry Register File
-    # Hierarchy: regfile_mem -> regfile_top
+    # Hierarchy: regfile_mem 
     # ══════════════════════════════════════════════════════════════════════════
     ("m02_regfile", "regfile_mem",
      "// 32x32 register array. Synchronous reset zeroes all registers. x0 always reads 0.\n"
@@ -115,19 +104,11 @@ SUBMODULES = [
      ");\n"
      "    reg [31:0] regs [0:31];\n"),
 
-    ("m02_regfile", "regfile_top",
-     "// 32-entry register file. Dual async read ports, single sync write. x0 hardwired 0.\n"
-     "module regfile (\n"
-     "    input         clk, rst,\n"
-     "    input  [4:0]  rs1, rs2, rd,\n"
-     "    input  [31:0] wdata,\n"
-     "    input         we,\n"
-     "    output [31:0] rdata1, rdata2\n"
-     ");\n"),
+ 
 
     # ══════════════════════════════════════════════════════════════════════════
     # M03 – UART Transmitter (8-N-1)
-    # Hierarchy: baud_gen -> uart_tx_shift -> uart_tx_fsm -> uart_tx_top
+    # Hierarchy: baud_gen -> uart_tx_shift -> uart_tx_fsm 
     # ══════════════════════════════════════════════════════════════════════════
     ("m03_uart", "baud_gen",
      "// Baud rate clock divider. Outputs single-cycle tick every CLK_FREQ/BAUD_RATE clocks.\n"
@@ -153,18 +134,12 @@ SUBMODULES = [
      "    output reg load, shift_en, tx_out, busy\n"
      ");\n"),
 
-    ("m03_uart", "uart_tx_top",
-     "// UART transmitter top (8-N-1). Parametric CLK_FREQ/BAUD_RATE. tx_start pulses send.\n"
-     "module uart_tx #(parameter CLK_FREQ=50000000, parameter BAUD_RATE=115200) (\n"
-     "    input       clk, rst, tx_start,\n"
-     "    input [7:0] tx_data,\n"
-     "    output      tx, busy\n"
-     ");\n"),
+ 
 
     # ══════════════════════════════════════════════════════════════════════════
     # M04 – Multi-Cycle RISC CPU
     # Hierarchy: cpu_alu -> cpu_imem -> cpu_dmem -> cpu_regfile ->
-    #            cpu_control -> cpu_datapath -> cpu_top
+    #            cpu_control -> cpu_datapath 
     # ══════════════════════════════════════════════════════════════════════════
     ("m04_cpu", "cpu_alu",
      "// 32-bit ALU. op: 0=ADD, 1=SUB, 2=AND, 3=OR. Combinational result and zero flag.\n"
@@ -227,15 +202,11 @@ SUBMODULES = [
      "    output        zero\n"
      ");\n"),
 
-    ("m04_cpu", "cpu_top",
-     "// Multi-cycle Harvard RISC CPU. 5-phase FSM (IF/ID/EX/MEM/WB). ADD/SUB/AND/OR/ADDI/LW/SW/BEQ.\n"
-     "module multicycle_cpu (\n"
-     "    input clk, rst\n"
-     ");\n"),
+   
 
     # ══════════════════════════════════════════════════════════════════════════
     # M05 – Hardwired Control Unit
-    # Hierarchy: ctrl_phase01 -> ctrl_phase234 -> ctrl_top
+    # Hierarchy: ctrl_phase01 -> ctrl_phase234 
     # ══════════════════════════════════════════════════════════════════════════
     ("m05_ctrl", "ctrl_phase01",
      "// Hardwired control unit: phases 0 (IF) and 1 (ID). 7-bit opcode + 3-bit phase input.\n"
@@ -257,20 +228,12 @@ SUBMODULES = [
      "    output reg   alu_src_a, alu_src_b, mem_to_reg, pc_source\n"
      ");\n"),
 
-    ("m05_ctrl", "ctrl_top",
-     "// Hardwired control unit top: 7-bit opcode, 3-bit phase. All 5 phases covered.\n"
-     "// Instantiates phase01 and phase234, merges outputs.\n"
-     "module hardwired_ctrl (\n"
-     "    input  [6:0] opcode,\n"
-     "    input  [2:0] phase,\n"
-     "    output       pc_write, ir_write, reg_write, mem_write,\n"
-     "    output       alu_src_a, alu_src_b, mem_to_reg, pc_source\n"
-     ");\n"),
+ 
 
     # ══════════════════════════════════════════════════════════════════════════
     # M06 – 5-Stage Pipelined RISC-V CPU
     # Hierarchy: rv_hazard -> rv_forward -> rv_if_stage -> rv_id_stage ->
-    #            rv_ex_stage -> rv_mem_stage -> rv_wb_stage -> rv_top
+    #            rv_ex_stage -> rv_mem_stage -> rv_wb_stage 
     # ══════════════════════════════════════════════════════════════════════════
     ("m06_riscv", "rv_hazard",
      "// RISC-V hazard detection. Load-use hazard: stall pipeline when id_ex_mem_read and rs match.\n"
@@ -334,16 +297,11 @@ SUBMODULES = [
      "    output [31:0] read_data\n"
      ");\n"),
 
-    ("m06_riscv", "rv_top",
-     "// 5-stage pipelined RISC-V CPU top. Hazard detection, forwarding unit.\n"
-     "// Supports: ADD/SUB/AND/OR/ADDI/LW/SW/BEQ.\n"
-     "module riscv_pipeline (\n"
-     "    input clk, rst\n"
-     ");\n"),
+  
 
     # ══════════════════════════════════════════════════════════════════════════
     # M07 – Direct-Mapped Cache (16-set)
-    # Hierarchy: cache_arrays -> cache_hit_logic -> cache_ctrl -> cache_top
+    # Hierarchy: cache_arrays -> cache_hit_logic -> cache_ctrl 
     # ══════════════════════════════════════════════════════════════════════════
     ("m07_cache", "cache_arrays",
      "// Cache storage: 16-entry tag array, 16x32-bit data array, 16 valid bits.\n"
@@ -378,22 +336,11 @@ SUBMODULES = [
      "    output reg   we_tag, we_data, mem_req, mem_we, stall\n"
      ");\n"),
 
-    ("m07_cache", "cache_top",
-     "// Direct-mapped write-through cache: 16 sets, 4-byte lines. 32-bit address.\n"
-     "// tag[31:6]=24b, index[5:2]=4b, offset[1:0]=2b. Valid array reset on rst.\n"
-     "module cache (\n"
-     "    input         clk, rst, cpu_req, cpu_we,\n"
-     "    input  [31:0] cpu_addr, cpu_wdata,\n"
-     "    output [31:0] cpu_rdata,\n"
-     "    output        stall,\n"
-     "    output [31:0] mem_addr,\n"
-     "    input  [31:0] mem_rdata,\n"
-     "    output        mem_req\n"
-     ");\n"),
+   
 
     # ══════════════════════════════════════════════════════════════════════════
     # M08 – Round-Robin Arbiter
-    # Hierarchy: rr_ptr -> rr_grant_logic -> rr_top
+    # Hierarchy: rr_ptr -> rr_grant_logic 
     # ══════════════════════════════════════════════════════════════════════════
     ("m08_arbiter", "rr_ptr",
      "// Round-robin priority pointer register. Updates to position after last grant on each cycle.\n"
@@ -411,19 +358,12 @@ SUBMODULES = [
      "    output [N-1:0] grant\n"
      ");\n"),
 
-    ("m08_arbiter", "rr_top",
-     "// Round-robin arbiter top: N requestors, registered one-hot grant, no starvation.\n"
-     "module round_robin_arbiter #(parameter N = 4) (\n"
-     "    input          clk, rst,\n"
-     "    input  [N-1:0] req,\n"
-     "    output [N-1:0] grant\n"
-     ");\n"),
-
+   
     # ══════════════════════════════════════════════════════════════════════════
     # M09 – AES-128 Encryption Core
     # Hierarchy: aes_sbox_lo -> aes_sbox_hi -> aes_sbox -> aes_subbytes ->
     #            aes_shiftrows -> aes_gf_mul -> aes_mixcolumns ->
-    #            aes_addroundkey -> aes_keyschedule -> aes_top
+    #            aes_addroundkey -> aes_keyschedule
     # Note: S-box split into lo/hi halves to stay within token budget
     # ══════════════════════════════════════════════════════════════════════════
     ("m09_aes", "aes_sbox_lo",
@@ -495,20 +435,12 @@ SUBMODULES = [
      "    output [1407:0] round_keys\n"
      ");\n"),
 
-    ("m09_aes", "aes_top",
-     "// AES-128 encryption core top. 10-round FSM. start pulses encryption.\n"
-     "// done asserts when ciphertext is ready.\n"
-     "module aes128 (\n"
-     "    input         clk, rst, start,\n"
-     "    input  [127:0] plaintext, key,\n"
-     "    output [127:0] ciphertext,\n"
-     "    output         done\n"
-     ");\n"),
+   
 
     # ══════════════════════════════════════════════════════════════════════════
     # M10 – SHA-256 Hash Core
     # Hierarchy: sha256_k_rom -> sha256_sigma -> sha256_msg_sched ->
-    #            sha256_compress -> sha256_top
+    #            sha256_compress 
     # ══════════════════════════════════════════════════════════════════════════
     ("m10_sha256", "sha256_k_rom",
      "// SHA-256 K constants ROM: 64 x 32-bit cube-root-derived primes. Combinational.\n"
@@ -545,19 +477,11 @@ SUBMODULES = [
      "    output [255:0]  H_out\n"
      ");\n"),
 
-    ("m10_sha256", "sha256_top",
-     "// SHA-256 core top. Single 512-bit block. FSM: IDLE->SCHEDULE->COMPRESS->DONE.\n"
-     "// Outputs 256-bit hash. start pulses computation. done indicates valid hash_out.\n"
-     "module sha256 (\n"
-     "    input         clk, rst, start,\n"
-     "    input  [511:0] block_in,\n"
-     "    output [255:0] hash_out,\n"
-     "    output         done\n"
-     ");\n"),
+  
 
     # ══════════════════════════════════════════════════════════════════════════
     # M11 – CRC-32 Engine (IEEE 802.3)
-    # Hierarchy: crc32_lfsr -> crc32_ctrl -> crc32_top
+    # Hierarchy: crc32_lfsr -> crc32_ctrl 
     # ══════════════════════════════════════════════════════════════════════════
     ("m11_crc32", "crc32_lfsr",
      "// CRC-32 bit-serial LFSR. Reflected polynomial 0xEDB88320. Updates on valid.\n"
@@ -577,18 +501,12 @@ SUBMODULES = [
      "    output [31:0] crc_out\n"
      ");\n"),
 
-    ("m11_crc32", "crc32_top",
-     "// CRC-32 IEEE 802.3 engine. Bit-serial. Reflected poly 0xEDB88320. Init/final XOR 0xFFFFFFFF.\n"
-     "module crc32 (\n"
-     "    input        clk, rst, start, data_in, valid,\n"
-     "    output [31:0] crc_out,\n"
-     "    output        ready\n"
-     ");\n"),
+   
 
     # ══════════════════════════════════════════════════════════════════════════
     # M12 – 8-Point Fixed-Point FFT
     # Hierarchy: fft_butterfly -> fft_twiddle_rom -> fft_stage1 ->
-    #            fft_stage23 -> fft_top
+    #            fft_stage23 
     # ══════════════════════════════════════════════════════════════════════════
     ("m12_fft", "fft_butterfly",
      "// Single Cooley-Tukey DIT butterfly. Q1.15 complex arithmetic.\n"
@@ -622,17 +540,11 @@ SUBMODULES = [
      "    output signed [127:0] s3re_flat, s3im_flat\n"
      ");\n"),
 
-    ("m12_fft", "fft_top",
-     "// 8-point fixed-point FFT top. Cooley-Tukey DIT, 3 stages, Q1.15 complex arithmetic.\n"
-     "// Output is in bit-reversed order.\n"
-     "module fft8 (\n"
-     "    input  signed [127:0] xre_flat, xim_flat,\n"
-     "    output signed [127:0] Xre_flat, Xim_flat\n"
-     ");\n"),
+
 
     # ══════════════════════════════════════════════════════════════════════════
     # M13 – 16×16 Matrix Multiplier
-    # Hierarchy: mac_unit -> mat_row -> mat_top
+    # Hierarchy: mac_unit -> mat_row 
     # ══════════════════════════════════════════════════════════════════════════
     ("m13_matmul", "mac_unit",
      "// Multiply-accumulate unit. 16-bit unsigned a,b. 32-bit accumulation.\n"
@@ -654,19 +566,10 @@ SUBMODULES = [
      "    output         done\n"
      ");\n"),
 
-    ("m13_matmul", "mat_top",
-     "// 16x16 matrix multiplier top. 16-bit unsigned inputs A,B. 32-bit output C=A*B.\n"
-     "// Pipelined: computes one row of C per 16 cycles. done when all 16 rows complete.\n"
-     "module matrix_mult (\n"
-     "    input         clk, rst, start,\n"
-     "    input  [4095:0] A_flat, B_flat,\n"
-     "    output [8191:0] C_flat,\n"
-     "    output          done\n"
-     ");\n"),
-
+   
     # ══════════════════════════════════════════════════════════════════════════
     # M14 – Hardware Bubble Sort
-    # Hierarchy: compare_swap -> bubble_sort_fsm -> bubble_sort_top
+    # Hierarchy: compare_swap -> bubble_sort_fsm 
     # ══════════════════════════════════════════════════════════════════════════
     ("m14_sort", "compare_swap",
      "// Compare-and-swap: outputs larger value to hi port, smaller to lo. Combinational.\n"
@@ -685,15 +588,7 @@ SUBMODULES = [
      "    output reg       swap_en, load_en, done\n"
      ");\n"),
 
-    ("m14_sort", "bubble_sort_top",
-     "// Hardware bubble sort top. 8 elements, 8-bit unsigned. FSM IDLE/LOAD/SORT/DONE.\n"
-     "// One compare-swap per clock cycle. done asserts when sorted.\n"
-     "module bubble_sort (\n"
-     "    input        clk, rst, start,\n"
-     "    input  [63:0] data_in_flat,\n"
-     "    output [63:0] data_out_flat,\n"
-     "    output        done\n"
-     ");\n"),
+  
 ]
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
