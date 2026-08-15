@@ -2,7 +2,7 @@
 #SBATCH --job-name=verigen
 #SBATCH --output=logs/verigen_%A_%a.out
 #SBATCH --error=logs/verigen_%A_%a.err
-#SBATCH --array=0-66
+#SBATCH --array=0-49
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
