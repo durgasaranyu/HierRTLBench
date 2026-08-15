@@ -74,7 +74,7 @@ regen_hierarchical() {
         --output_dir "$HIER_DIR"
     info "Writing integration top modules..."
     python3 "$VGEN_DIR/write_integrations.py" \
-        --output_dir "$HIER_DIR"
+        --output_dir "$HIER_DIR/$model"
 }
 
 # ── Unified generation ────────────────────────────────────────────────────────
