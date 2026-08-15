@@ -4,12 +4,14 @@ evaluate_syntax.py — HierRTLBench Syntax Pass-Rate Evaluator
 =============================================================
 Measures iverilog syntax pass rates matching the paper's methodology:
 
-  HIERARCHICAL: each individual submodule .v file is checked independently
+  HIERARCHICAL: each submodule .v file is checked TOGETHER WITH its
+                dedicated testbench (tb_<name>.v under --tb_dir), matching
+                Section 5 ("Verification") of the paper.
                 (per-submodule-file metric, denominator = number of .v files)
   UNIFIED:      each unified .v file is checked independently
                 (per-file metric, denominator = 14 modules)
 
-This per-file approach is consistent with the paper's reported numbers:
+This approach is consistent with the paper's reported numbers:
   VeriGen-2B  ~44%  | VeriGen-6B  0%  | VeriGen-16B ~54% (hierarchical)
 
 Usage:
@@ -83,12 +85,12 @@ def check_iverilog() -> bool:
         return False
 
 
-def iverilog_check_file(verilog_file: str) -> tuple[bool, str]:
+def iverilog_check_file(verilog_files: list[str]) -> tuple[bool, str]:
     """
-    Run `iverilog -tnull` on a SINGLE file independently.
-    Returns (passed: bool, first_error: str).
+    Run `iverilog -tnull` on one or more files together (e.g. a submodule
+    plus its dedicated testbench). Returns (passed: bool, first_error: str).
     """
-    cmd = ["iverilog", "-tnull", verilog_file]
+    cmd = ["iverilog", "-tnull", *verilog_files]
     try:
         result = subprocess.run(
             cmd, capture_output=True, text=True, timeout=30
@@ -104,6 +106,18 @@ def iverilog_check_file(verilog_file: str) -> tuple[bool, str]:
         return False, str(exc)
 
 
+def find_testbench(submodule_file: Path, folder: str, tb_dir: Path) -> Path | None:
+    """
+    Locate the dedicated testbench for a given submodule file.
+    Convention: tb_dir/<module_folder>/tb_<submodule_name>.v
+    e.g. verigen_out/2B/m09_aes/aes_sbox.v ->
+         verigen_testbenches/verigen_testbenches/m09_aes/tb_aes_sbox.v
+    """
+    stem = submodule_file.stem  # e.g. "aes_sbox"
+    candidate = tb_dir / folder / f"tb_{stem}.v"
+    return candidate if candidate.exists() else None
+
+
 def evaluate_model(
     model: str,
     hier_dir: Path,
@@ -114,9 +128,11 @@ def evaluate_model(
     """
     Evaluate syntax pass rates for a single model.
 
-    Hierarchical: each LLM-generated submodule .v file is checked independently.
-                  Integration files (*_integration.v) are excluded — they are
-                  written deterministically by write_integrations.py, not by the LLM.
+    Hierarchical: each LLM-generated submodule .v file is compiled TOGETHER
+                  WITH its dedicated testbench (tb_<name>.v under tb_dir),
+                  per Section 5 of the paper. Integration files
+                  (*_integration.v) are excluded — they are written
+                  deterministically by write_integrations.py, not by the LLM.
     Unified:      each unified .v file is checked independently.
 
     Pass criterion: iverilog -tnull exits with return code 0.
@@ -146,7 +162,13 @@ def evaluate_model(
         mod_pass = 0
         mod_total = len(sub_files)
         for f in sub_files:
-            ok, err = iverilog_check_file(str(f))
+            tb = find_testbench(f, folder, tb_dir)
+            files_to_compile = [str(f)] + ([str(tb)] if tb else [])
+            ok, err = iverilog_check_file(files_to_compile)
+            if tb is None and verbose:
+                print(f"  WARNING: no testbench found for {f.name} "
+                      f"(expected tb_dir/{folder}/tb_{f.stem}.v) — "
+                      f"compiling standalone")
             results["hierarchical"].append((str(f), label, ok, err))
             if ok:
                 mod_pass += 1
@@ -160,7 +182,7 @@ def evaluate_model(
         # ── Unified: per-file ─────────────────────────────────────────────────
         u_path = unified_dir / model / UNIFIED_FILES[idx]
         if u_path.exists():
-            ok_u, err_u = iverilog_check_file(str(u_path))
+            ok_u, err_u = iverilog_check_file([str(u_path)])
         else:
             ok_u, err_u = False, "output file missing"
         results["unified"].append((label, ok_u, err_u))
@@ -178,7 +200,7 @@ def print_summary(all_results: dict, models: list[str]) -> None:
     # ── Hierarchical: per-submodule-file ──────────────────────────────────────
     print(f"\n{'='*62}")
     print("  Hierarchical Generation — Syntax Pass Rate")
-    print("  (each individual submodule .v file checked independently)")
+    print("  (each submodule .v file checked WITH its testbench)")
     print(f"{'='*62}")
     header = f"{'Model':<8}  {'Passed':>10}  {'Total files':>11}  {'Rate':>8}"
     print(header)
@@ -253,7 +275,10 @@ def main() -> None:
     parser.add_argument(
         "--tb_dir",
         default="vgen_project/verigen_testbenches/verigen_testbenches",
-        help="Root of testbench directory (not used for syntax-only checks, reserved for future use)",
+        help="Root of testbench directory. Hierarchical submodules are "
+             "compiled together with tb_dir/<module_folder>/tb_<name>.v "
+             "when a matching testbench exists (falls back to standalone "
+             "compilation with a warning if not found).",
     )
     parser.add_argument(
         "--models",
