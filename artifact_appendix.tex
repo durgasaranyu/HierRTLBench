@@ -342,7 +342,9 @@ Syntax Pass\% = $(50-\text{F1}-\text{F2})/50$; Simulation Pass\% =
 $(50-\text{F1}-\text{F2}-\text{F3}-\text{F4}-\text{F5})/50$.
 
 \noindent\textbf{Tolerance:} Pass rates may vary by $\pm$1 submodule
-($\pm$2\%) across runs due to temperature sampling.
+($\pm$2\%) across runs due to minor library/driver version drift (e.g.\
+\texttt{iverilog} version, PyTorch/CUDA build) --- generation itself is
+deterministic (\texttt{temperature=0}, greedy decoding).
 
 \noindent\textbf{Functional pass rate (paper Table~4, not scripted):} the
 paper additionally reports end-to-end functional pass rates of 30\%~(2B),
