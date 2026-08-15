@@ -25,7 +25,6 @@ HierRTLBench/
 ├── artifact_appendix.tex            ← MLCAD AE appendix (LaTeX)
 ├── MLCAD_HierRTLBench.pdf           ← Paper (camera-ready)
 ├── HierRTLBench.docx                ← Technical report artifact
-├── Hpc_environment_setup_log.md     ← HPC setup/troubleshooting log
 ├── requirements.txt                 ← Python dependencies (pip)
 ├── conda_env.yml                    ← Python dependencies (conda, alternative)
 ├── run_evaluation.sh                ← End-to-end evaluation script
@@ -235,7 +234,7 @@ cd vgen_project && sbatch run_unified.slurm
 ```bash
 # Deterministic integration wrappers (no LLM) — writes <module>_top_integration.v
 python vgen_project/write_integrations.py \
-    --output_dir vgen_project/verigen_out
+    --output_dir vgen_project/verigen_out/2B   # (repeat per model, or per model in the loop)
 ```
 
 **Step 5: Evaluate syntax**
@@ -250,13 +249,15 @@ python evaluate_syntax.py \
 ### Option C: Smoke Test (Single Submodule, Fast)
 
 ```bash
-# Generate only M01 ALU adder-subtractor with VeriGen-2B
+# Generate only M02 Register File memory submodule with VeriGen-2B
 python vgen_project/verigen_runner.py --model 2B \
     --output_dir /tmp/hier_smoke \
-    --idx 0
+    --idx 5
 
-# Check iverilog syntax on the generated file
-iverilog -tnull /tmp/hier_smoke/m01_alu/alu_addsub.v && echo "PASS" || echo "FAIL"
+# Check iverilog syntax on the generated file (together with its testbench)
+iverilog -tnull vgen_project/verigen_out/2B/m02_regfile/regfile_mem.v \
+    vgen_project/verigen_testbenches/verigen_testbenches/m02_regfile/tb_regfile_mem.v \
+    && echo "PASS" || echo "FAIL"
 ```
 
 ---
@@ -265,7 +266,7 @@ iverilog -tnull /tmp/hier_smoke/m01_alu/alu_addsub.v && echo "PASS" || echo "FAI
 
 ### `evaluate_syntax.py`
 
-Checks iverilog syntax for all generated outputs and computes per-module and overall pass rates.
+Checks iverilog syntax for all generated outputs and computes per-module and overall pass rates. Each hierarchical submodule is compiled together with its dedicated testbench (`tb_<name>.v`) when one is found under `--tb_dir`.
 
 ```
 usage: evaluate_syntax.py [-h] [--hier_dir DIR] [--unified_dir DIR]
@@ -298,7 +299,7 @@ Estimated GPU time per model:
 | 6B | ~2 min | ~1.7 hrs |
 | 16B | ~3 min | ~2.5 hrs |
 
-For detailed environment setup and cluster troubleshooting notes, see [`Hpc_environment_setup_log.md`](Hpc_environment_setup_log.md).
+For cluster-specific environment setup, see the comments at the top of `vgen_project/setup_env.sh` and each `.slurm` script.
 
 ---
 
