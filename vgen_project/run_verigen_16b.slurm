@@ -2,7 +2,7 @@
 #SBATCH --job-name=verigen_16b
 #SBATCH --output=logs/verigen_16b_%A_%a.out
 #SBATCH --error=logs/verigen_16b_%A_%a.err
-#SBATCH --array=0-63                        # same 64 submodules
+#SBATCH --array=0-49                      
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G                           # 16B fp16 ≈ 32 GB VRAM; bump CPU RAM too
