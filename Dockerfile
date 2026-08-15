@@ -11,8 +11,10 @@
 # Build:
 #   docker build -t hierrtlbench-ae .
 # Smoke test (matches artifact_appendix.tex "Installation" section):
+#   docker build -t hierrtlbench-ae .
 #   docker run --rm hierrtlbench-ae \
-#     iverilog -tnull vgen_project/verigen_out/2B/m01_alu/alu_addsub.v
+#     iverilog -tnull vgen_project/verigen_out/2B/m02_regfile/regfile_mem.v \
+#     && echo PASS || echo FAIL
 # Full cached-output evaluation (reproduces the paper's key table):
 #   docker run --rm hierrtlbench-ae bash run_evaluation.sh --cached
 
