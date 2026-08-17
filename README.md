@@ -23,7 +23,7 @@ The benchmark covers 14 hardware design modules ranging from a simple ALU to AES
 HierRTLBench/
 ├── README.md                        ← This file
 ├── artifact_appendix.tex            ← MLCAD AE appendix (LaTeX)
-├── HierRTLBench_MLCAD_Final_Camera_Ready.pdf           ← Paper (camera-ready)
+├── HierRTLBench_MLCAD_Final.pdf     ← Paper (camera-ready)
 ├── HierRTLBench.docx                ← Technical report artifact
 ├── requirements.txt                 ← Python dependencies (pip)
 ├── conda_env.yml                    ← Python dependencies (conda, alternative)
