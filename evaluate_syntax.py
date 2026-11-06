@@ -114,6 +114,11 @@ def find_testbench(submodule_file: Path, folder: str, tb_dir: Path) -> Path | No
          verigen_testbenches/verigen_testbenches/m09_aes/tb_aes_sbox.v
     """
     stem = submodule_file.stem  # e.g. "aes_sbox"
+    # The testbenches used for the paper were written per model: tb_dir/<model>/<module_folder>/tb_<name>.v
+    model = submodule_file.parent.parent.name  # e.g. "2B"
+    per_model = tb_dir / model / folder / f"tb_{stem}.v"
+    if per_model.exists():
+        return per_model
     candidate = tb_dir / folder / f"tb_{stem}.v"
     return candidate if candidate.exists() else None
 
